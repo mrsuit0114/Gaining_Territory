@@ -51,8 +51,32 @@ class MACHINE():
 
                 return random.choice(first_available)
             
-            # 겹치지 않는 선분이 없으면 랜덤 초이스
+            # 겹치지 않는 선분이 없으면 삼각형을 짝수로 만들 수 있는 선분 중에 랜덤 초이스
             else:                           
+                
+                second_available = []
+
+                for second_line in available:
+                    
+                    dlc = self.drawn_lines.copy()
+                    dlc.append(second_line)
+
+                    i = 0
+                    while len(self.check_triangle(dlc)) > 0 :
+
+                        l = random.choice(self.check_triangle(dlc))
+                        dlc.append(l)
+                        i = i + 1
+                    
+                    if i % 2 == 0:
+                        second_available.append(second_line)
+
+
+                if len(second_available) > 0:
+
+                    return random.choice(second_available)
+                
+                else:
 
                     return random.choice(available)
 
