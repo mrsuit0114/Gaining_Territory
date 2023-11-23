@@ -373,6 +373,7 @@ class SYSTEM():
                         empty = False
 
                 if empty:
+                    print("dd")
                     self.triangles.append(triangle)
                     self.score[PLAYERS.index(self.turn)]+=1
 
