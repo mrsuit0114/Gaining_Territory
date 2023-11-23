@@ -54,25 +54,46 @@ class MACHINE():
             # 겹치지 않는 선분이 없으면 삼각형을 짝수로 만들 수 있는 선분 중에 랜덤 초이스
             else:                           
                 
-                second_available = []
+                second_available = []                   # 후보 리스트 생성
+                not_second_available = []               # 후보가 아닌 리스트 생성
+                available_copy = available.copy()       
+                available_copy2 = [sorted(sublist, key=lambda x: (x[0], x[1])) for sublist in available_copy]       # 선분 조합 정렬
+                
 
-                for second_line in available:
+                for second_line in available_copy2:
                     
-                    dlc = self.drawn_lines.copy()
-                    dlc.append(second_line)
-
-                    i = 0
-                    while len(self.check_triangle(dlc)) > 0 :
-
-                        l = random.choice(self.check_triangle(dlc))
-                        dlc.append(l)
-                        i = i + 1
+                    if second_line not in second_available and second_line not in not_second_available:     # 선분 후보가 후보랑 후보가아닌 리스트면 검사 
                     
-                    if i % 2 == 0:
-                        second_available.append(second_line)
+                        dlc = self.drawn_lines.copy()       # 임시 그려진 선분 리스트 생성
+                        dlc.append(second_line)             # 임시 그려진 선분 리스트에 second line 추가
 
+                        i = 0                               # i 만들어진 삼각형의 개수
+                        while len(self.check_triangle(dlc)) > 0 :   # second line 추가 된 상태에서 삼각형이 만들어질 수 있는 선분이 있으면
 
-                if len(second_available) > 0:
+                            l = random.choice(self.check_triangle(dlc))     # 그 중 랜덤 선택
+                            dlc.append(l)                                   # 임시 그려진 선분 리스트에 추가
+                            i = i + 1                                       # 삼각형의 개수 + 1 
+                        
+                        if i % 2 == 0:                                      # 삼각형의 개수가 짝수이면
+                            
+                            line_set = [sublist for sublist in dlc if sublist not in self.drawn_lines]      # 새로 생긴 선분집합
+                            
+            
+
+                            for j in line_set:
+                                if j not in second_available:             # 후보 리스트에 선분이 없으면
+                                    second_available.append(j)            # 후보 리스트에 추가
+                        else:
+                            
+                            line_set = [sublist for sublist in dlc if sublist not in self.drawn_lines]      # 새로 생긴 선분집합
+                            
+                        
+
+                            for j in line_set:
+                                if j not in not_second_available:           # 후보가 아닌 리스트에 선분이 없으면
+                                    not_second_available.append(j)          # 후보가 아닌 리스트에 추가
+
+                if len(second_available) > 0:                           # 후보 리스트가 있으면 그 중 랜덤 반환
 
                     return random.choice(second_available)
                 
