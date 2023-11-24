@@ -3,8 +3,7 @@ from itertools import chain, combinations, product
 from shapely.geometry import LineString, Point, Polygon
 from collections import deque
 from anytree import Node, RenderTree
-import copy
-        
+
 class Counter: # call by ref
     def __init__(self,counter):
         self.counter = counter
@@ -22,6 +21,7 @@ class Config:
         self.value = 0 # value 리프노드의 값이 중요하고 리프까지 가져가기 위한 값
         self.line = [] # [(x1,y1),(x2,y2)] 해당 노드가 그리는 엣지 점의 좌표
         self.drawn_lines= [] # 해당 노드에서 그려진 라인들
+        self.available = []  # 해당 노드에서 다음에 그릴 수 있는 라인들
         
 def InsertNode(key : Counter, parent=None):
     newConf = Config(key)
@@ -64,7 +64,8 @@ def check_triangle(line, drawn_lines, triangles, whole_points):
         return tri
     
     return 0
-            
+
+DEPTH_LIMIT = 7
     
 
 class MACHINE():
@@ -95,7 +96,7 @@ class MACHINE():
         if len(self.drawn_lines)==0:
             return random.choice(available)
         
-        tmp = copy.deepcopy(available)
+        tmp = available[:]
         
         for l in available: # line=[(x1,y1),(x2,y2)]
             for d in self.drawn_lines:
@@ -112,8 +113,10 @@ class MACHINE():
         rconf = Config(c)
         rconf.drawn_lines = self.drawn_lines
         root = InsertNode(c)
-        root.config.drawn_lines = copy.deepcopy(self.drawn_lines)
-        root.config.available = copy.deepcopy(available)
+        # root.config.drawn_lines = copy.copy(self.drawn_lines)
+        # root.config.available = copy.copy(available)
+        root.config.drawn_lines = self.drawn_lines[:]
+        root.config.available = available[:]
         
         #dq
         dq = deque()
@@ -121,22 +124,42 @@ class MACHINE():
         
         #tree expansion
         # 나중에 삼각형안에 도트있는지도 고려해야함  // 고려함
+        # 5개일때는 되는데 10개점인경우 너무 오래걸림
         while dq:
             curNode = dq.pop()
-            for l in curNode.config.available:
-                ct = check_triangle(l, curNode.config.drawn_lines,self.triangles,self.whole_points)
-                if ct == -1:
-                    continue
-                newNode : Node = InsertNode(c,curNode)
-                newNode.config.line = l
-                newNode.config.drawn_lines = copy.deepcopy(curNode.config.drawn_lines)
-                newNode.config.drawn_lines.append(l)
-                newNode.config.available = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], newNode.config.drawn_lines)]
-                newNode.config.triangle = ct
-                newNode.config.value = curNode.config.value + ct
-                dq.append(newNode)
-                
+            if curNode.depth < DEPTH_LIMIT:
+                for l in curNode.config.available:
+                    ct = check_triangle(l, curNode.config.drawn_lines,self.triangles,self.whole_points)
+                    if ct == -1:
+                        continue
+                    newNode : Node = InsertNode(c,curNode)
+                    newNode.config.line = l
+                    # newNode.config.drawn_lines = copy.copy(curNode.config.drawn_lines)
+                    newNode.config.drawn_lines = curNode.config.drawn_lines[:]
+                    newNode.config.drawn_lines.append(l)
+                    # newNode.config.available = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], newNode.config.drawn_lines)]
+                    line_string = LineString(l)
+                    for i in curNode.config.available:
+                        # if len(list(set([i[0], i[1], l[0], l[1]]))) == 3: # 끝에서 만나는선분은 크로스하지않는다
+                        #     continue
+                        # elif not bool(line_string.intersection(LineString(i))): # 크로스하지 않는 경우의 선분만 자식의 available로 넘겨줌
+                        #     newNode.config.available.append((i[0],i[1]))
+                            
+                        if bool(line_string.intersection(LineString(i)) and len(list(set([i[0], i[1], l[0], l[1]]))) != 3): # 서로겹치는데 점에서 만나는게 아닌 경우
+                            continue
+                        else:
+                            newNode.config.available.append((i[0],i[1]))
+                        
+                    newNode.config.triangle = ct
+                    newNode.config.value = curNode.config.value + ct
+                    dq.append(newNode)
+        
         print(RenderTree(root))
+        
+        # min-max
+        
+        
+                
         
         print("return #2")
         return random.choice(available)
