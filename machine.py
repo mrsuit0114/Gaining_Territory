@@ -12,8 +12,8 @@ class Counter_depth: # call by ref
         self.counter = counter
         
 def organize_points(point_list):
-    point_list = sorted(point_list, key=lambda x: (x[0], x[1]))
-    return point_list
+        point_list = sorted(point_list, key=lambda x: (x[0], x[1]))
+        return point_list
         
 
 class Config:
@@ -101,7 +101,7 @@ class MACHINE():
         self.triangles = [] # [(a, b), (c, d), (e, f)]
 
     def find_best_selection(self):      
-        
+
         if len(self.drawn_lines) == 0:
             available0 = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], self.drawn_lines)]
             dlc0 = self.drawn_lines.copy()
@@ -114,8 +114,6 @@ class MACHINE():
                 l_count += 1
 
             print("선의 개수:", l_count)
-        
-
 
         available = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], self.drawn_lines)] 
 
@@ -181,11 +179,21 @@ class MACHINE():
                     node.parent.config.value = max(node.config.value, node.parent.config.value)
             
             print(root.config.value)
+            tmp = -10000
+            minMaxLine=[]
+            # for i in root.children:
+            #     if root.config.value == i.config.value:
+            #         print("#1 minmax")
+            #         return i.config.line
+            
             for i in root.children:
-                if root.config.value == i.config.value:
-                    print("#1 minmax")
-                    print(i.config.line)
-                    return i.config.line
+                if tmp < i.config.value:
+                    tmp = i.config.value
+                    minMaxLine = i.config.line
+                    
+            print("#1 minmax")
+            return minMaxLine
+            
 
             # nextMinMax = set()
             # # min-max
