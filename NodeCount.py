@@ -16,7 +16,7 @@ class NodeCount(tk.Canvas):
         #클릭
         self.bind("<Button-1>", self.on_click)
 
-        self.run_count = 0  # Run 클릭횟수
+        self.run_count = 0  # Run 클릭횟수 / 반복 기능 
 
     def draw_board(self):
         board_size_pixels = self.board_size * self.cell_size
@@ -79,10 +79,10 @@ class NodeCount(tk.Canvas):
         num_edges = len(self.find_withtag("edge"))
         print(f"Number of edges: {num_edges} ") #(Max possible: {max_possible_edges}) 넣어도 되고 의미는 없음.
 
-        #Repeat 런 카운트
+        #Repeat 런 카운트 / 반복 기능
         self.run_count += 1
 
-        # run 한번 하고 나서 자동으로 리셋
+        # run 한번 하고 나서 자동으로 리셋 / 반복 기능
         if self.run_count == 1:
             self.run_count = 0
             self.reset_edges()
