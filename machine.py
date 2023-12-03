@@ -12,8 +12,8 @@ class Counter_depth: # call by ref
         self.counter = counter
         
 def organize_points(point_list):
-        point_list = sorted(point_list, key=lambda x: (x[0], x[1]))
-        return point_list
+    point_list = sorted(point_list, key=lambda x: (x[0], x[1]))
+    return point_list
         
 
 class Config:
@@ -101,6 +101,21 @@ class MACHINE():
         self.triangles = [] # [(a, b), (c, d), (e, f)]
 
     def find_best_selection(self):      
+        
+        if len(self.drawn_lines) == 0:
+            available0 = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], self.drawn_lines)]
+            dlc0 = self.drawn_lines.copy()
+            l_count = 0
+
+            while len(available0) > 0:
+                l = random.choice(available0)
+                dlc0.append(l)
+                available0 = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], dlc0)]
+                l_count += 1
+
+            print("선의 개수:", l_count)
+        
+
 
         available = [[point1, point2] for (point1, point2) in list(combinations(self.whole_points, 2)) if self.check_availability([point1, point2], self.drawn_lines)] 
 
@@ -169,6 +184,7 @@ class MACHINE():
             for i in root.children:
                 if root.config.value == i.config.value:
                     print("#1 minmax")
+                    print(i.config.line)
                     return i.config.line
 
             # nextMinMax = set()
