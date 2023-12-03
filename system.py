@@ -275,7 +275,7 @@ class SYSTEM():
         self.machine.location = self.location
         self.machine.triangles = self.triangles
 
-        line = self.machine.find_best_selection()
+        line = self.machine.find_best_selection()  # 여기서 아무것도 리턴 못하면 에러가 나는거같은데
         line = self.organize_points(line)
 
         if self.check_availability("MACHINE", line ):

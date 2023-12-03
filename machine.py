@@ -166,10 +166,21 @@ class MACHINE():
                     node.parent.config.value = max(node.config.value, node.parent.config.value)
             
             print(root.config.value)
+            tmp = -10000
+            minMaxLine=[]
+            # for i in root.children:
+            #     if root.config.value == i.config.value:
+            #         print("#1 minmax")
+            #         return i.config.line
+            
             for i in root.children:
-                if root.config.value == i.config.value:
-                    print("#1 minmax")
-                    return i.config.line
+                if tmp < i.config.value:
+                    tmp = i.config.value
+                    minMaxLine = i.config.line
+                    
+            print("#1 minmax")
+            return minMaxLine
+            
 
             # nextMinMax = set()
             # # min-max
